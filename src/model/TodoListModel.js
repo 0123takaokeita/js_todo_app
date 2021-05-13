@@ -34,6 +34,14 @@ export class TodoListModel extends EventEmitter {
     }
 
     /**
+     * TodoListの状態が更新されたときに呼び出されるリスナー関数を解除する
+     * @param {Function} listener
+     */
+    offChange(listener) {
+        this.removeEventListener("change", listener);
+    }
+
+    /**
      * 状態が変更されたときに呼ぶ。登録済みのリスナー関数を呼び出す
      */
     emitChange() {
@@ -45,6 +53,10 @@ export class TodoListModel extends EventEmitter {
      * @param {TodoItemModel} todoItem
      */
     addTodo(todoItem) {
+        // タイトルが空のものは追加しない
+        if (todoItem.isEmptyTitle()) {
+            return;
+        }
         this.items.push(todoItem);
         this.emitChange();
     }
@@ -54,7 +66,6 @@ export class TodoListModel extends EventEmitter {
      * @param {{ id:number, completed: boolean }}
      */
     updateTodo({ id, completed }) {
-        // `id`が一致するTodoItemを見つけ、あるなら完了状態の値を更新する
         const todoItem = this.items.find(todo => todo.id === id);
         if (!todoItem) {
             return;
@@ -63,17 +74,15 @@ export class TodoListModel extends EventEmitter {
         this.emitChange();
     }
 
-        /**
+    /**
      * 指定したidのTodoItemを削除する
      * @param {{ id: number }}
      */
-        deleteTodo({ id }) {
-            // `id`に一致しないTodoItemだけを残すことで、`id`に一致するTodoItemを削除する
-            this.items = this.items.filter(todo => {
-                return todo.id !== id;
-            });
-            this.emitChange();
-        }
+    deleteTodo({ id }) {
+        // `id`に一致しないTodoItemだけを残すことで、`id`に一致するTodoItemを削除する
+        this.items = this.items.filter(todo => {
+            return todo.id !== id;
+        });
+        this.emitChange();
+    }
 }
-
-
